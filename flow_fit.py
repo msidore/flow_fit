@@ -150,8 +150,17 @@ if __name__ == '__main__':
         # t1 is the array corresponding to the times of the data points
         if len(fic3[ite][-1]) != 0:
             if fic3[ite][-1][0] == '':
+                # This condition is for badly formatted, out of experiment files
                 t1 = np.array([float(x[0]) for x in fic3[ite] if x[0]!=''])
                 noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if x[0]!=''])
+            elif len(fic3[ite][-1]) == 2:
+                # This condition is actually for rightly formatted csv files
+                t1 = np.array([float(x[0]) for x in fic3[ite] if x[0]!=''])
+                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if x[0]!=''])
+            else:
+                # And this is if there are even stranger things happening with the formatting
+                print "Error with formatting, exiting ..."
+                sys.exit()
         else:
             t1 = np.array([float(x[0]) for x in fic3[ite] if len(x)!=0])
             noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if len(x)!=0])
