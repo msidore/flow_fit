@@ -11,6 +11,9 @@ import matplotlib.patches as patches
 from scipy.optimize import curve_fit
 from scipy.signal import savgol_filter
 from scipy.stats import linregress
+# Ignore warnings - ofc you can't divide by 0
+import warnings
+warnings.filterwarnings("ignore")
 
 """
 
