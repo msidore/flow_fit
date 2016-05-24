@@ -145,9 +145,14 @@ if __name__ == '__main__':
 
         # Get the data
         # t1 is the array corresponding to the times of the data points
-        t1 = np.array([float(x[0]) for x in fic3[ite] if len(x)!=0])
+        if len(fic3[ite][-1]) != 0:
+            if fic3[ite][-1][0] == '':
+                t1 = np.array([float(x[0]) for x in fic3[ite] if x[0]!=''])
+                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if x[0]!=''])
+        else:
+            t1 = np.array([float(x[0]) for x in fic3[ite] if len(x)!=0])
+            noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if len(x)!=0])
         # noisy1 is the data array - which is noisy, which is why its name is "noisy1" - *10^-6 because the values are so high
-        noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if len(x)!=0])
 
         # Split at the first minima
         for x in range(len(noisy1)):
