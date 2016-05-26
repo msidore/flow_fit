@@ -151,12 +151,12 @@ if __name__ == '__main__':
         if len(fic3[ite][-1]) != 0:
             if fic3[ite][-1][0] == '':
                 # This condition is for badly formatted, out of experiment files
-                t1 = np.array([float(x[0]) for x in fic3[ite] if x[0]!=''])
-                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if x[0]!=''])
+                t1 = np.array([float(x[0]) for x in fic3[ite] if (x[0]!='' and x[1]!='')])
+                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if (x[0]!='' and x[1]!='')])
             elif len(fic3[ite][-1]) == 2:
                 # This condition is actually for rightly formatted csv files
-                t1 = np.array([float(x[0]) for x in fic3[ite] if x[0]!=''])
-                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if x[0]!=''])
+                t1 = np.array([float(x[0]) for x in fic3[ite] if (x[0]!='' and x[1]!='')])
+                noisy1 = np.array([0.000001*float(x[1]) for x in fic3[ite] if (x[0]!='' and x[1]!='')])
             else:
                 # And this is if there are even stranger things happening with the formatting
                 print "Error with formatting, exiting ..."
