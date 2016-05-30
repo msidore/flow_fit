@@ -11,6 +11,7 @@ import matplotlib.patches as patches
 from scipy.optimize import curve_fit
 from scipy.signal import savgol_filter
 from scipy.stats import linregress
+from scipy.stats import chisquare
 # Ignore warnings - ofc you can't divide by 0
 import warnings
 warnings.filterwarnings("ignore")
@@ -72,11 +73,11 @@ savgol = args.savgol
 # Use the right template for simple/double exponent
 if exp_type == True:
     TEMPLATE = """
-    %s \t %s \t %s \t %s \t %s \t %s \t %s
+    %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s
     """
 else:
     TEMPLATE = """
-    %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s
+    %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s
     """
 
 def simple_exponent(t, a1, b1, baseline):
@@ -88,6 +89,12 @@ def double_exponent(t, a1, a2, b1, b2, baseline):
     t2 = t
     return a1*np.exp(-b1/t1) + a2*np.exp(-b2/t2) + baseline
 
+def RMSD_f(data, fit):
+    """ Calculates the RMSD between two arrays """
+    su = [(data[i] - fit[i])**2 for i in range(len(data))]
+    squared = np.sum(su)/float(len(data))
+    return np.sqrt(squared)
+
 ######################## Main ########################
 
 if __name__ == '__main__':
@@ -95,9 +102,9 @@ if __name__ == '__main__':
     # Open/create the file that will contain the parameters
     textfile = open(outfile, "w")
     if exp_type == True:
-        textfile.write("name \t a1 \t a1-stdev \t Tau1 \t baseline \t baseline-stdev \t R")
+        textfile.write("name \t a1 \t a1-stdev \t Tau1 \t baseline \t baseline-stdev \t R \t Chi2 \t Chi2-P \t RMSD")
     else:
-        textfile.write("name \t a1 \t a1-stdev \t a2 \t a2-stdev \t Tau1 \t Tau2 \t baseline \t baseline-stdev \t R")
+        textfile.write("name \t a1 \t a1-stdev \t a2 \t a2-stdev \t Tau1 \t Tau2 \t baseline \t baseline-stdev \t R \t Chi2 \t Chi2-P \t RMSD")
     # Open/create the file that will contain the residuals and raw/smoothed data
     textfile_data = open("%s_data" % outfile, "w")
 
@@ -206,8 +213,14 @@ if __name__ == '__main__':
             r = linregress(data, yarray)[2]
             rsquared = str(r**2)
 
+            # Get the chi2
+            chisquare_data = chisquare(data, f_exp=yarray)
+
+            # And the RMSD
+            RMSD = RMSD_f(data, yarray)
+
             # Write the parameters into the outfile
-            textfile.write(TEMPLATE % (outnum[ite], fitParams[0], perr[0], fitParams[1], fitParams[2], perr[2], rsquared))
+            textfile.write(TEMPLATE % (outnum[ite], fitParams[0], perr[0], fitParams[1], fitParams[2], perr[2], rsquared, chisquare_data[0], chisquare_data[1], RMSD))
             # And the data - with or without smoothing
             textfile_data.write("Experiment %s\n" % outnum[ite])
             if savgol == True:
@@ -239,8 +252,14 @@ if __name__ == '__main__':
             r = linregress(data, yarray)[2]
             rsquared = str(r**2)
 
+            # Get the chi2
+            chisquare_data = chisquare(data, f_exp=yarray)
+
+            # And the RMSD
+            RMSD = RMSD_f(data, yarray)
+
             # Write the parameters into the outfile
-            textfile.write(TEMPLATE % (outnum[ite], fitParams[0], perr[0], fitParams[1], perr[1], fitParams[2], fitParams[3], fitParams[4], perr[4], rsquared))
+            textfile.write(TEMPLATE % (outnum[ite], fitParams[0], perr[0], fitParams[1], perr[1], fitParams[2], fitParams[3], fitParams[4], perr[4], rsquared, chisquare_data[0], chisquare_data[1], RMSD))
             # And the data - with or without smoothing
             textfile_data.write("Experiment %s\n" % outnum[ite])
             if savgol == True:
