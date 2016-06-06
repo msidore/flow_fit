@@ -15,6 +15,7 @@ from scipy.stats import chisquare
 # Ignore warnings - ofc you can't divide by 0
 import warnings
 warnings.filterwarnings("ignore")
+import pylab
 
 """
 
@@ -201,6 +202,9 @@ if __name__ == '__main__':
         else:
             data = noisy
 
+        # Small variable to store the residuals for later
+        residuals = []
+
         # Now the curve fitting part - depends if it's with a simple or a double exponent
         if exp_type == True:
             # Get the parameters and the covariance matrix from the fit
@@ -231,6 +235,8 @@ if __name__ == '__main__':
                     y_fit = simple_exponent(t[i], fitParams[0], fitParams[1], fitParams[2])
                     # Get the residual
                     y_residual = noisy[i] - y_fit
+                    # Store the residual
+                    residuals.append(y_residual)
                     # Write out everything
                     textfile_data.write(str(y_residual) + ";" + str(y_fit) + ";" + str(noisy[i]) + ";" + str(data[i]) + "\n")
                 textfile_data.write("\n")
@@ -239,6 +245,8 @@ if __name__ == '__main__':
                 for i in range(len(t)):
                     y_fit = simple_exponent(t[i], fitParams[0], fitParams[1], fitParams[2])
                     y_residual = noisy[i] - y_fit
+                    # Store the residual
+                    residuals.append(y_residual)
                     textfile_data.write(str(y_residual) + ";" + str(y_fit) + ";" + str(noisy[i]) + "\n")
                 textfile_data.write("\n")
         else:
@@ -271,6 +279,8 @@ if __name__ == '__main__':
                     y_fit = double_exponent(t[i], fitParams[0], fitParams[1], fitParams[2], fitParams[3], fitParams[4])
                     # Get the residual
                     y_residual = noisy[i] - y_fit
+                    # Store the residual
+                    residuals.append(y_residual)
                     # Write out everything
                     textfile_data.write(str(y_residual) + ";" + str(y_fit) + ";" + str(noisy[i]) + ";" + str(data[i]) + "\n")
                 textfile_data.write("\n")
@@ -279,11 +289,13 @@ if __name__ == '__main__':
                 for i in range(len(t)):
                     y_fit = double_exponent(t[i], fitParams[0], fitParams[1], fitParams[2], fitParams[3], fitParams[4])
                     y_residual = noisy[i] - y_fit
+                    # Store the residual
+                    residuals.append(y_residual)
                     textfile_data.write(str(y_residual) + ";" + str(y_fit) + ";" + str(noisy[i]) + "\n")
                 textfile_data.write("\n")
 
         # Makes figures
-        plt.figure(outnum[ite])
+        fig = plt.figure(outnum[ite])
         # With a title
         plt.title(title + "_" + outnum[ite])
         # A label to the x
@@ -295,10 +307,26 @@ if __name__ == '__main__':
         # The original data
         plt.plot(t, noisy)
         plt.savefig(outnum[ite] + '.ps')
+
+        # And the residuals
+        plt.figure(outnum[ite] + "res")
+        plt.title(title + "_" + outnum[ite] + "_residuals")
+        plt.xlabel("Time(s)")
+        plt.ylabel("Residual, *10^6")
+        # The residuals
+        plt.scatter(t, residuals)
+        # And a line around 0
+        plt.plot([0 for x in range(len(t))], color="black", linestyle="--", linewidth=0.5)
+        # And adjust the y to the residuals
+        pylab.ylim([min(residuals), max(residuals)])
+        pylab.xlim([min(t), max(t)])
+        # Also, save the figure
+        plt.savefig(outnum[ite] + "_residuals.ps")
+
         plt.close(outnum[ite])
 
     # Cat and save the .ps into a .pdf
-    ps_list = " ".join([outnum[ite] + '.ps' for ite in range(len(outnum))])
+    ps_list = " ".join([outnum[ite] + '.ps ' + outnum[ite] + '_residuals.ps' for ite in range(len(outnum))])
     bash_command = "cat " + ps_list + "> " + outfile + 'stopflow.ps'
     os.system(bash_command)
     bash_command = "epstopdf " + "--exact " + outfile + "stopflow.ps"
