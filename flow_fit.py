@@ -83,12 +83,12 @@ else:
 
 def simple_exponent(t, a1, b1, baseline):
     t1 = t
-    return a1*np.exp(-b1/t1) + baseline
+    return a1*np.exp(-t1/b1) + baseline
 
 def double_exponent(t, a1, a2, b1, b2, baseline):
     t1 = t
     t2 = t
-    return a1*np.exp(-b1/t1) + a2*np.exp(-b2/t2) + baseline
+    return a1*np.exp(-t1/b1) + a2*np.exp(-t2/b2) + baseline
 
 def RMSD_f(data, fit):
     """ Calculates the RMSD between two arrays """
