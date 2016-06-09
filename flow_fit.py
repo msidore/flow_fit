@@ -81,14 +81,14 @@ else:
     %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s
     """
 
-def simple_exponent(t, a1, b1, baseline):
+def simple_exponent(t, a1, tau, baseline):
     t1 = t
-    return a1*np.exp(-t1/b1) + baseline
+    return a1*np.exp(-t1/tau) + baseline
 
-def double_exponent(t, a1, a2, b1, b2, baseline):
+def double_exponent(t, a1, a2, tau1, tau2, baseline):
     t1 = t
     t2 = t
-    return a1*np.exp(-t1/b1) + a2*np.exp(-t2/b2) + baseline
+    return a1*np.exp(-t1/tau1) + a2*np.exp(-t2/tau2) + baseline
 
 def RMSD_f(data, fit):
     """ Calculates the RMSD between two arrays """
